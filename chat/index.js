@@ -1,8 +1,7 @@
 module.exports.socketServer = (http) => {
     
     const io = require('socket.io')(http);
-    var activeUsers = [],
-        activeSocketId = [];
+    var activeUsers = [];
 
     io.on('connection', (socket) => {
         // console.log(socket.id);
@@ -24,12 +23,26 @@ module.exports.socketServer = (http) => {
 
         socket.on('disconnect', function(){
             /**
-             * deactivating online user from activated user list
+             * List of Sockets
              */
             let sockets = activeUsers.map(val => val.sockets);
-            
-            delete activeUsers[ sockets.findIndex((val) => { return (val == socket.id) } ) ];
 
+            /**
+             * List of Users
+             */
+            let users = activeUsers.map(val => val.rooms);
+
+            /**
+             * Sending other users that one user is offline
+             */
+            
+            socket.broadcast.emit('offline user', users[ activeUsers.findIndex((val) => { return (val.sockets == socket.id) } ) ] );
+            
+            /**
+             * Deactivating online user from activated user list
+             */
+            activeUsers.splice(sockets.findIndex((val) => { return (val == socket.id) } ), 1 );
+            
         });
 
         socket.on('send message', (data) => {
