@@ -66,7 +66,7 @@ module.exports.socketServer = (http) => {
         });
 
         socket.on('online users', () => {
-            socket.broadcast.emit('new active user', activeUsers.map(val => val.rooms));
+            socket.emit('new active user', activeUsers.map(val => val.rooms));
         });
 
         socket.on('send message', (data) => {
